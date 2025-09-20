@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License along
 # with fas-rs. If not, see <https://www.gnu.org/licenses/>.
 
-mode=/dev/fas_rs/mode
+mode=/data/adb/fas_rs/node
 
 case "$1" in
 "init" | "fast" | "pedestal") echo fast >$mode ;;
