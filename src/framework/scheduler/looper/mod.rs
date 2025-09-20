@@ -45,7 +45,11 @@ use buffer::{Buffer, BufferWorkingState};
 use clean::Cleaner;
 
 const DELAY_TIME: Duration = Duration::from_secs(3);
-const EXCLUDE_LIST: &[&str] = &["com.tungsten.fcl"];
+const EXCLUDE_LIST: &[&str] = &[
+    "com.tungsten.fcl",
+    "net.kdt.pojavlaunch",
+    "com.tungsten.hmclpe",
+];
 
 #[derive(PartialEq)]
 enum State {
