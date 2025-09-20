@@ -126,6 +126,7 @@ impl Config {
         }
     }
 
+    #[must_use]
     pub fn logger_level(&mut self) -> log::LevelFilter {
         match self.inner.config().logger_level.as_str() {
             "debug" => log::LevelFilter::Debug,
