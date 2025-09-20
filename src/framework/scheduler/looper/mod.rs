@@ -180,7 +180,7 @@ impl Looper {
                 && EXCLUDE_LIST.contains(&buffer.package_info.pkg.as_str())
             {
                 self.disable_fas();
-                debug!("pkg is in EXCLUDE_LIST, fas is disabled");
+                warn!("pkg is in EXCLUDE_LIST, fas is disabled");
                 continue;
             }
 
