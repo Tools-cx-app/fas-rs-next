@@ -16,7 +16,8 @@ MSG_TEMPLATE = """
 New push to Github
 ```
 {commit_message}
-``` by {another}
+```
+by {another}
 See commit detail [here]({commit_url})
 """.strip()
 
