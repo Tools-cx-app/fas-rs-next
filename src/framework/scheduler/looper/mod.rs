@@ -19,7 +19,10 @@ mod buffer;
 mod clean;
 mod policy;
 
-use std::time::{Duration, Instant};
+use std::{
+    fs,
+    time::{Duration, Instant},
+};
 
 use frame_analyzer::Analyzer;
 use likely_stable::{likely, unlikely};
@@ -50,6 +53,7 @@ const EXCLUDE_LIST: &[&str] = &[
     "net.kdt.pojavlaunch",
     "com.tungsten.hmclpe",
 ];
+const DISABL_PATH: &str = "/data/adb/fas_rs/disable";
 
 #[derive(PartialEq)]
 enum State {
@@ -168,7 +172,16 @@ impl Looper {
     }
 
     pub fn enter_loop(&mut self) -> Result<()> {
+        let mut diable = false;
         loop {
+            if fs::exists(DISABL_PATH)? {
+                diable = true;
+                if diable {
+                    info!("fas is disabled");
+                }
+            } else if diable {
+                diable = false;
+            }
             self.switch_mode();
             let _ = self.update_analyzer();
             self.retain_topapp();
