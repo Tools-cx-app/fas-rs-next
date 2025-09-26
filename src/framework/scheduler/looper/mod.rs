@@ -26,7 +26,7 @@ use std::{
 
 use frame_analyzer::Analyzer;
 use likely_stable::{likely, unlikely};
-use log::{debug, info};
+use log::{debug, info, warn};
 use policy::{ControllerParams, controll::calculate_control};
 
 use super::{FasData, thermal::Thermal, topapp::TopAppsWatcher};
@@ -173,6 +173,7 @@ impl Looper {
 
     pub fn enter_loop(&mut self) -> Result<()> {
         let mut diable = false;
+        let mut freedom = false;
         loop {
             if fs::exists(DISABL_PATH)? {
                 diable = true;
@@ -190,8 +191,13 @@ impl Looper {
 
             if self.windows_watcher.visible_freeform_window() {
                 self.disable_fas();
-                debug!("has freedom, fas is disabled");
+                freedom = true;
+                if freedom {
+                    warn!("has freedom, fas is disabled");
+                }
                 continue;
+            } else if freedom {
+                freedom = false;
             }
 
             if let Some(buffer) = self.fas_state.buffer.as_ref()
