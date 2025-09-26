@@ -179,6 +179,7 @@ impl Looper {
                 if diable {
                     info!("fas is disabled");
                 }
+                continue;
             } else if diable {
                 diable = false;
             }
