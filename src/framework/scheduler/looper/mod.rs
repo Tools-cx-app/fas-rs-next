@@ -184,6 +184,7 @@ impl Looper {
             } else if diable {
                 diable = false;
             }
+
             self.switch_mode();
             let _ = self.update_analyzer();
             self.retain_topapp();
