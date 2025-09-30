@@ -174,6 +174,7 @@ impl Looper {
     pub fn enter_loop(&mut self) -> Result<()> {
         let mut diable = false;
         let mut freedom = false;
+        let mut exclude = false;
         loop {
             if fs::exists(DISABL_PATH)? {
                 diable = true;
@@ -205,8 +206,13 @@ impl Looper {
                 && EXCLUDE_LIST.contains(&buffer.package_info.pkg.as_str())
             {
                 self.disable_fas();
-                debug!("pkg is in EXCLUDE_LIST, fas is disabled");
+                exclude = true;
+                if exclude {
+                    warn!("pkg is in EXCLUDE_LIST, fas is disabled");
+                }
                 continue;
+            } else if exclude {
+                exclude = false;
             }
 
             if let Some(data) = self.recv_message() {
