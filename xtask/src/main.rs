@@ -38,6 +38,9 @@ struct Cli {
     /// Enable extension features
     #[clap(long, default_value = "false")]
     extension: bool,
+    /// Enable scene features
+    #[clap(long, default_value = "false")]
+    scene: bool,
 }
 
 #[derive(Subcommand)]
@@ -98,7 +101,7 @@ fn main() -> Result<()> {
             check(release, verbose)?;
         }
         Commands::Build { release, verbose } => {
-            build(release, verbose, cli.extension)?;
+            build(release, verbose, cli.extension, cli.scene)?;
         }
         Commands::Clean => {
             clean()?;
@@ -117,37 +120,31 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn build(release: bool, verbose: bool, extension: bool) -> Result<()> {
+fn build(release: bool, verbose: bool, extension: bool, scene: bool) -> Result<()> {
     let temp_dir = temp_dir(release);
 
     let _ = fs::remove_dir_all(&temp_dir);
     fs::create_dir_all(&temp_dir)?;
 
     let mut cargo = cargo_ndk();
+    let mut args = vec![
+        "build",
+        "--target",
+        "aarch64-linux-android",
+        "-Z",
+        "build-std",
+        "-Z",
+        "trim-paths",
+    ];
     if extension {
-        cargo.args([
-            "build",
-            "--target",
-            "aarch64-linux-android",
-            "-Z",
-            "build-std",
-            "-Z",
-            "trim-paths",
-            "--features",
-            "extension",
-        ]);
-    } else {
-        cargo.args([
-            "build",
-            "--target",
-            "aarch64-linux-android",
-            "-Z",
-            "build-std",
-            "-Z",
-            "trim-paths",
-        ]);
+        args.push("--features");
+        args.push("extension");
     }
-
+    if scene {
+        args.push("--features");
+        args.push("scene");
+    }
+    cargo.args(args);
     if release {
         cargo.arg("--release");
     }
