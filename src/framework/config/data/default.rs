@@ -22,6 +22,7 @@ impl Config {
         true
     }
 
+    #[cfg(feature = "scene")]
     pub const fn default_value_scene_game_list() -> bool {
         true
     }

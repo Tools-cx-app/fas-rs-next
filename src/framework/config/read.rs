@@ -20,22 +20,29 @@ use std::{fs, path::Path, sync::mpsc::Sender, time::Duration};
 use inotify::{Inotify, WatchMask};
 use log::{debug, error, info};
 
-use super::data::{ConfigData, SceneAppList};
+use super::data::ConfigData;
+#[cfg(feature = "scene")]
+use super::data::SceneAppList;
 use crate::framework::error::Result;
 
+#[cfg(feature = "scene")]
 const SCENE_PROFILE: &str = "/data/data/com.omarea.vtools/shared_prefs/games.xml";
 const MAX_RETRY_COUNT: u8 = 20;
 
 pub(super) fn wait_and_read(path: &Path, std_path: &Path, sx: &Sender<ConfigData>) -> Result<()> {
     let std_config = read_config(std_path)?;
 
+    #[allow(unused_mut)]
     loop {
         match read_config_with_retry(path) {
             Ok(mut config) => {
-                if config.config.scene_game_list
-                    && let Err(e) = read_scene_games(&mut config)
+                #[cfg(feature = "scene")]
                 {
-                    error!("Failed to read scene games: {e}");
+                    if config.config.scene_game_list
+                        && let Err(e) = read_scene_games(&mut config)
+                    {
+                        error!("Failed to read scene games: {e}");
+                    }
                 }
                 sx.send(config).unwrap();
             }
@@ -74,6 +81,7 @@ fn read_config_with_retry(path: &Path) -> Result<ConfigData> {
     }
 }
 
+#[cfg(feature = "scene")]
 fn read_scene_games(config: &mut ConfigData) -> Result<()> {
     let p = Path::new(SCENE_PROFILE);
     if p.exists() {
@@ -95,12 +103,14 @@ fn read_scene_games(config: &mut ConfigData) -> Result<()> {
 fn wait_until_update(path: &Path) -> Result<()> {
     let mut inotify = Inotify::init()?;
 
-    if fs::exists(SCENE_PROFILE)? {
-        inotify
-            .watches()
-            .add(SCENE_PROFILE, WatchMask::MODIFY | WatchMask::CLOSE_WRITE)?;
+    #[cfg(feature = "scene")]
+    {
+        if fs::exists(SCENE_PROFILE)? {
+            inotify
+                .watches()
+                .add(SCENE_PROFILE, WatchMask::MODIFY | WatchMask::CLOSE_WRITE)?;
+        }
     }
-
     inotify
         .watches()
         .add(path, WatchMask::MODIFY | WatchMask::CLOSE_WRITE)?;
