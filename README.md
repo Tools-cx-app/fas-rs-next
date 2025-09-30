@@ -44,7 +44,7 @@
 
 - ### **配置路径: `/sdcard/Android/fas-rs/games.toml`**
 
-  - **logger_level**
+- ### **logger_level**
 
     - 类型: `String`
     - `info`: 使用 info 级别logger \*
