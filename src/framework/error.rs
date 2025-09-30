@@ -38,8 +38,6 @@ pub enum Error {
     SerToml(#[from] toml::ser::Error),
     #[error(transparent)]
     DeToml(#[from] toml::de::Error),
-    #[error(transparent)]
-    SerXml(#[from] quick_xml::DeError),
     #[error("Missing {0} when building Scheduler")]
     SchedulerMissing(&'static str),
     #[error(transparent)]

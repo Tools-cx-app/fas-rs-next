@@ -40,8 +40,6 @@ pub struct ConfigData {
 pub struct Config {
     #[serde(default = "Config::default_value_keep_std")]
     pub keep_std: bool,
-    #[serde(default = "Config::default_value_scene_game_list")]
-    pub scene_game_list: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -85,13 +83,6 @@ impl From<MarginFpsValue> for f64 {
             MarginFpsValue::Int(i) => i as Self,
         }
     }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename = "map")]
-pub struct SceneAppList {
-    #[serde(rename = "boolean")]
-    pub apps: Vec<SceneApp>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
