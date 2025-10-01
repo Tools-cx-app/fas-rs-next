@@ -153,12 +153,13 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt update
-          sudo apt install -y gcc-multilib
+          sudo apt install -y gcc-multilib patch
           cargo install cargo-ndk --locked
       - name: Build
         run: |
           export ANDROID_NDK_HOME=$(realpath ~/ndk_temp)
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
+          patch -p0 > config.patch
           cargo xtask --scene build -r -v
           mv "output/fas-rs-next(release).zip" "output/fas-rs-next-scene(release).zip"
       - name: Cleanup
