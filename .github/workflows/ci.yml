@@ -60,7 +60,9 @@ jobs:
         run: |
           export ANDROID_NDK_HOME=$(realpath ~/ndk_temp)
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
+          cargo ndk -t arm64-v8a b -r --package daemon
           cargo xtask build -r -v
+          cp ./target/aarch64-linux-android/release/daemon  ./module/
       - name: Cleanup
         run: rm -rf ~/ndk_temp
       - name: Prepare artifacts
@@ -109,7 +111,9 @@ jobs:
         run: |
           export ANDROID_NDK_HOME=$(realpath ~/ndk_temp)
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
+          cargo ndk -t arm64-v8a b -r --package daemon
           cargo xtask --extension build -r -v
+          cp ./target/aarch64-linux-android/release/daemon  ./module/
           mv "output/fas-rs-next(release).zip" "output/fas-rs-next-extension(release).zip"
       - name: Cleanup
         run: rm -rf ~/ndk_temp
@@ -159,8 +163,10 @@ jobs:
         run: |
           export ANDROID_NDK_HOME=$(realpath ~/ndk_temp)
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
-          patch -p0 > config.patch
+          cargo ndk -t arm64-v8a b -r --package daemon
           cargo xtask --scene build -r -v
+          cp ./target/aarch64-linux-android/release/daemon  ./module/
+          patch -p0 > config.patch
           mv "output/fas-rs-next(release).zip" "output/fas-rs-next-scene(release).zip"
       - name: Cleanup
         run: rm -rf ~/ndk_temp
