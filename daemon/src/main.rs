@@ -58,5 +58,7 @@ fn main() -> Result<()> {
                 .arg(SU_TOAST)
                 .output();
         }
+
+        std::thread::sleep(std::time::Duration::from_secs(5));
     }
 }
