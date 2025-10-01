@@ -16,7 +16,7 @@
 # with fas-rs. If not, see <https://www.gnu.org/licenses/>.
 
 [workspace]
-members = ["xtask"]
+members = [ "daemon","xtask"]
 
 [package]
 name = "fas-rs-next"

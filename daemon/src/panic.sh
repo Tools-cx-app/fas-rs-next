@@ -1,0 +1,1 @@
+cmd notification post -S bigtext -t 'FAS-RS-NEXT' 'Tag' 'fas-rs-next crashes'
