@@ -49,6 +49,7 @@ fn main() -> Result<()> {
         }
 
         if check_state {
+            check_state = false;
             let time = Local::now();
             println!("{time} fas-rs-next crashes");
             let _ = Command::new("su")
