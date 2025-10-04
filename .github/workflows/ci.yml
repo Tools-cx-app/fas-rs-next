@@ -56,6 +56,11 @@ jobs:
           sudo apt update
           sudo apt install -y gcc-multilib
           cargo install cargo-ndk --locked
+      - name: Setup WebUI Deps
+        run: |
+          npm install next@latest react@latest react-dom@latest
+          cd webui
+          npm install
       - name: Build
         run: |
           export ANDROID_NDK_HOME=$(realpath ~/ndk_temp)
@@ -107,6 +112,11 @@ jobs:
           sudo apt update
           sudo apt install -y gcc-multilib
           cargo install cargo-ndk --locked
+      - name: Setup WebUI Deps
+        run: |
+          npm install next@latest react@latest react-dom@latest
+          cd webui
+          npm install
       - name: Build
         run: |
           export ANDROID_NDK_HOME=$(realpath ~/ndk_temp)
@@ -157,8 +167,13 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt update
-          sudo apt install -y gcc-multilib patch
+          sudo apt install -y gcc-multilib
           cargo install cargo-ndk --locked
+      - name: Setup WebUI Deps
+        run: |
+          npm install next@latest react@latest react-dom@latest
+          cd webui
+          npm install
       - name: Build
         run: |
           export ANDROID_NDK_HOME=$(realpath ~/ndk_temp)
