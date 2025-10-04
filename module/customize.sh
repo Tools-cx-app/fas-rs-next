@@ -29,14 +29,6 @@ local_print() {
 	fi
 }
 
-local_echo() {
-	if [ $LOCALE = zh-CN ]; then
-		echo "$1"
-	else
-		echo "$2"
-	fi
-}
-
 if [ $ARCH != arm64 ]; then
 	local_print "设备不支持, 非arm64设备" "Only for arm64 device !"
 	abort
