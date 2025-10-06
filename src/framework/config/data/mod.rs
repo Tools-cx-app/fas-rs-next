@@ -96,6 +96,7 @@ pub struct SceneAppList {
     pub apps: Vec<SceneApp>,
 }
 
+#[cfg(feature = "scene")]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SceneApp {
     #[serde(rename = "@name")]

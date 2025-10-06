@@ -839,7 +839,7 @@ dependencies = [
  "frame-analyzer-ebpf-common",
  "libc",
  "mio",
- "thiserror 2.0.16",
+ "thiserror 2.0.17",
 ]
 
 [[package]]
