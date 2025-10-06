@@ -172,18 +172,10 @@ impl Looper {
     }
 
     pub fn enter_loop(&mut self) -> Result<()> {
-        let mut diable = false;
-        let mut freedom = false;
-        let mut exclude = false;
         loop {
             if fs::exists(DISABL_PATH)? {
-                diable = true;
-                if diable {
-                    info!("fas is disabled");
-                }
+                debug!("fas is disabled");
                 continue;
-            } else if diable {
-                diable = false;
             }
 
             self.switch_mode();
@@ -193,26 +185,16 @@ impl Looper {
 
             if self.windows_watcher.visible_freeform_window() {
                 self.disable_fas();
-                freedom = true;
-                if freedom {
-                    warn!("has freedom, fas is disabled");
-                }
+                debug!("has freedom, fas is disabled");
                 continue;
-            } else if freedom {
-                freedom = false;
             }
 
             if let Some(buffer) = self.fas_state.buffer.as_ref()
                 && EXCLUDE_LIST.contains(&buffer.package_info.pkg.as_str())
             {
                 self.disable_fas();
-                exclude = true;
-                if exclude {
-                    warn!("pkg is in EXCLUDE_LIST, fas is disabled");
-                }
+                debug!("pkg is in EXCLUDE_LIST, fas is disabled");
                 continue;
-            } else if exclude {
-                exclude = false;
             }
 
             if let Some(data) = self.recv_message() {
