@@ -21,7 +21,3 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
-  - package-ecosystem: "cargo" # See documentation for possible values
-    directory: "/xtask" # Location of package manifests
-    schedule:
-      interval: "weekly"
