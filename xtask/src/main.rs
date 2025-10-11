@@ -38,9 +38,6 @@ struct Cli {
     /// Enable extension features
     #[clap(long, default_value = "false")]
     extension: bool,
-    /// Enable scene features
-    #[clap(long, default_value = "false")]
-    scene: bool,
 }
 
 #[derive(Subcommand)]
@@ -101,7 +98,7 @@ fn main() -> Result<()> {
             check(release, verbose)?;
         }
         Commands::Build { release, verbose } => {
-            build(release, verbose, cli.extension, cli.scene)?;
+            build(release, verbose, cli.extension)?;
         }
         Commands::Clean => {
             clean()?;
@@ -120,7 +117,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn build(release: bool, verbose: bool, extension: bool, scene: bool) -> Result<()> {
+fn build(release: bool, verbose: bool, extension: bool) -> Result<()> {
     let temp_dir = temp_dir(release);
 
     let _ = fs::remove_dir_all(&temp_dir);
@@ -139,10 +136,6 @@ fn build(release: bool, verbose: bool, extension: bool, scene: bool) -> Result<(
     if extension {
         args.push("--features");
         args.push("extension");
-    }
-    if scene {
-        args.push("--features");
-        args.push("scene");
     }
     cargo.args(args);
     if release {
