@@ -50,7 +50,7 @@ jobs:
           components: rust-src
       - uses: Swatinem/rust-cache@v2
         with:
-          shared-key: "ndk-${{ env.NDK_VERSION }}-rust"
+          shared-key: "ndk-rust"
       - name: Install build dependencies
         run: |
           sudo apt update
@@ -104,7 +104,7 @@ jobs:
           components: rust-src
       - uses: Swatinem/rust-cache@v2
         with:
-          shared-key: "ndk-${{ env.NDK_VERSION }}-rust"
+          shared-key: "ndk-rust"
       - name: Install build dependencies
         run: |
           sudo apt update
