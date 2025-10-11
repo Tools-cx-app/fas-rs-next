@@ -139,64 +139,6 @@ jobs:
           name: fas-rs-next-extension(release)
           compression-level: 9
           path: output/artifact/release
-  release-scene-build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Cache NDK
-        id: cache-ndk
-        uses: actions/cache@v4
-        with:
-          path: ~/ndk_temp
-          key: ndk-${{ runner.os }}-ndk_temp
-      - name: Setup ndk
-        if: steps.cache-ndk.outputs.cache-hit != 'true'
-        run: |
-          ndk_url=$(wget -qO- https://github.com/android/ndk/releases/latest | grep -e 'https://dl.google.com/android/repository/android-ndk-.*-linux.zip' | sed -n 's/.*<a href="\([^"]*\)".*/\1/p')
-          wget -O ndk.zip $ndk_url -nv
-          mkdir -p ~/ndk_temp
-          unzip ndk.zip -d ~/ndk_temp 2>&1 > /dev/null
-          mv ~/ndk_temp/*/* ~/ndk_temp
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: nightly
-          targets: aarch64-linux-android
-          components: rust-src
-      - uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: "ndk-${{ env.NDK_VERSION }}-rust"
-      - name: Install build dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y gcc-multilib
-          cargo install cargo-ndk --locked
-      - name: Setup WebUI Deps
-        run: |
-          npm install next@latest react@latest react-dom@latest
-          cd webui
-          npm install
-      - name: Build
-        run: |
-          export ANDROID_NDK_HOME=$(realpath ~/ndk_temp)
-          export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
-          cargo ndk -t arm64-v8a b -r --package daemon
-          cp ./target/aarch64-linux-android/release/daemon  ./module/
-          cargo xtask --scene build -r -v
-          patch -p0 > config.patch
-          mv "output/fas-rs-next(release).zip" "output/fas-rs-next-scene(release).zip"
-      - name: Cleanup
-        run: rm -rf ~/ndk_temp
-      - name: Prepare artifacts
-        run: |
-          mkdir -p output/artifact/release
-          unzip "output/fas-rs-next-scene(release).zip" -d output/artifact/release
-      - name: Upload release version
-        uses: actions/upload-artifact@v4
-        with:
-          name: fas-rs-next-scene(release)
-          compression-level: 9
-          path: output/artifact/release
   push_to_ci_group:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -204,7 +146,6 @@ jobs:
     needs:
       - release-extension-build
       - release-build
-      - release-scene-build
     steps:
       - uses: actions/checkout@v4
       - name: Download Artifacts
@@ -217,8 +158,6 @@ jobs:
           zip -9 -rq "../../fas-rs-next(release).zip" .
           cd "${{ github.workspace }}/artifacts/fas-rs-next-extension(release)"
           zip -9 -rq "../../fas-rs-next-extension(release).zip" .
-          cd "${{ github.workspace }}/artifacts/fas-rs-next-scene(release)"
-          zip -9 -rq "../../fas-rs-next-scene(release).zip" .
           cd "${{ github.workspace }}"
       - name: Upload
         env:
