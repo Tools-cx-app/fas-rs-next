@@ -98,7 +98,7 @@ fn main() -> Result<()> {
 
     match command {
         Commands::Check { release, verbose } => {
-            check(release, verbose, cli.extension, cli.scene)?;
+            check(release, verbose)?;
         }
         Commands::Build { release, verbose } => {
             build(release, verbose, cli.extension, cli.scene)?;
@@ -191,9 +191,9 @@ fn build(release: bool, verbose: bool, extension: bool, scene: bool) -> Result<(
     Ok(())
 }
 
-fn check(release: bool, verbose: bool, extension: bool, scene: bool) -> Result<()> {
+fn check(release: bool, verbose: bool) -> Result<()> {
     let mut cargo = cargo_ndk();
-    let mut args = vec![
+    cargo.args([
         "check",
         "--target",
         "aarch64-linux-android",
@@ -201,16 +201,7 @@ fn check(release: bool, verbose: bool, extension: bool, scene: bool) -> Result<(
         "build-std",
         "-Z",
         "trim-paths",
-    ];
-    if extension {
-        args.push("--features");
-        args.push("extension");
-    }
-    if scene {
-        args.push("--features");
-        args.push("scene");
-    }
-    cargo.args(args);
+    ]);
     cargo.env("RUSTFLAGS", "-C default-linker-libraries");
 
     if release {
