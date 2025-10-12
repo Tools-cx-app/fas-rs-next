@@ -39,7 +39,6 @@ pub enum Error {
     #[error(transparent)]
     DeToml(#[from] toml::de::Error),
     #[error(transparent)]
-    #[cfg(feature = "scene")]
     SerXml(#[from] quick_xml::DeError),
     #[error("Missing {0} when building Scheduler")]
     SchedulerMissing(&'static str),

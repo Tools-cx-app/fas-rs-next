@@ -40,7 +40,6 @@ pub struct ConfigData {
 pub struct Config {
     #[serde(default = "Config::default_value_keep_std")]
     pub keep_std: bool,
-    #[cfg(feature = "scene")]
     #[serde(default = "Config::default_value_scene_game_list")]
     pub scene_game_list: bool,
 }
@@ -88,7 +87,6 @@ impl From<MarginFpsValue> for f64 {
     }
 }
 
-#[cfg(feature = "scene")]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename = "map")]
 pub struct SceneAppList {
