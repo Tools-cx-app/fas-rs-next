@@ -1,0 +1,30 @@
+name: Rustfmt check && Clippy check
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+          targets: aarch64-linux-android
+          components: rust-src
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "ndk-rust"
+      - name: Install build dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y gcc-multilib
+      - name: Run rustfmt
+        run: cargo fmt -- --check
+      - name: Run cargo clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
