@@ -1,0 +1,22 @@
+name: Rustfmt check && Clippy check
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install nightly
+        run: |
+          rustup toolchain install nightly --component rustfmt,clippy \
+                                --profile minimal --no-self-update
+          rustup default nightly
+      - name: Run rustfmt
+        run: cargo fmt -- --check
+      - name: Run cargo clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
