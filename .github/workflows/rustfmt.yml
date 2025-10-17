@@ -16,10 +16,7 @@ jobs:
         with:
           toolchain: nightly
           targets: aarch64-linux-android
-          components: rust-src
-      - uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: "ndk-rust"
+          components: rustfmt,clippy
       - name: Install build dependencies
         run: |
           sudo apt update
