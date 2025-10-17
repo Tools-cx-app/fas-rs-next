@@ -11,11 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install nightly
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+          targets: aarch64-linux-android
+          components: rust-src
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "ndk-rust"
+      - name: Install build dependencies
         run: |
-          rustup toolchain install nightly --component rustfmt,clippy \
-                                --profile minimal --no-self-update
-          rustup default nightly
+          sudo apt update
+          sudo apt install -y gcc-multilib
       - name: Run rustfmt
         run: cargo fmt -- --check
       - name: Run cargo clippy
