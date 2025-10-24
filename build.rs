@@ -92,6 +92,7 @@ fn gen_module_prop(data: &CargoConfig) -> Result<()> {
         }
     }
     let author = author.trim();
+    let version = format!("{}-{}", package.version, cal_short_hash()?);
 
     let mut file = fs::OpenOptions::new()
         .create(true)
@@ -101,14 +102,12 @@ fn gen_module_prop(data: &CargoConfig) -> Result<()> {
 
     writeln!(file, "id={id}")?;
     writeln!(file, "name={}", package.name)?;
-    writeln!(
-        file,
-        "version=v{}",
-        format!("{}-{}", package.version, cal_short_hash()?).trim()
-    )?;
+    writeln!(file, "version=v{}", version.trim())?;
     writeln!(file, "versionCode={version_code}")?;
     writeln!(file, "author={author}")?;
     writeln!(file, "description={}", package.description)?;
+
+    println!("cargo:rustc-env=GIT_HASH={}", version.trim());
 
     Ok(())
 }

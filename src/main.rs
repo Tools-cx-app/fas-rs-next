@@ -33,7 +33,7 @@ use std::{env, fs, io::prelude::*, process};
 
 use anyhow::Result;
 use env_logger::Builder;
-use log::{debug, error, warn};
+use log::{debug, error, info, warn};
 use mimalloc::MiMalloc;
 
 use cpu_common::Controller;
@@ -97,6 +97,7 @@ where
     let cpu = Controller::new()?;
 
     debug!("{cpu:#?}");
+    info!("version: {}", env!("GIT_HASH"));
 
     Scheduler::new()
         .config(config)
