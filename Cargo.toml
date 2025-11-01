@@ -57,7 +57,6 @@ anyhow = "1.0.100"
 toml = "0.9.8"
 serde_json = "1.0.145"
 serde = { version = "1.0.228", features = ["derive"] }
-rocket = { version = "0.5.0", features = ["json"] }
 
 [profile.dev]
 overflow-checks = false
