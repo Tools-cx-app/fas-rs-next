@@ -643,6 +643,7 @@ dependencies = [
  "sys-mount",
  "thiserror 2.0.17",
  "toml",
+ "zygisk-frame-analyzer",
 ]
 
 [[package]]
@@ -2065,4 +2066,11 @@ checksum = "eb81183ddd97d0c74cedf1d50d85c8d08c1b8b68ee863bdee9e706eedba1a237"
 dependencies = [
  "cc",
  "pkg-config",
+]
+
+[[package]]
+name = "zygisk-frame-analyzer"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
 ]

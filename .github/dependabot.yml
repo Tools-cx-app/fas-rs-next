@@ -22,7 +22,7 @@ updates:
     schedule:
       interval: "weekly"
   - package-ecosystem: "cargo" # See documentation for possible values
-    directory: "/daemon" # Location of package manifests
+    directory: "/workspaces/daemon" # Location of package manifests
     schedule:
       interval: "weekly"
       
