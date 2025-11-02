@@ -2070,3 +2070,6 @@ dependencies = [
 [[package]]
 name = "zygisk-frame-analyzer"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+]

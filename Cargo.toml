@@ -16,7 +16,7 @@
 # with fas-rs. If not, see <https://www.gnu.org/licenses/>.
 
 [workspace]
-members = [ "daemon","xtask", "zygisk-frame-analyzer"]
+members = [ "workspaces/daemon","workspaces/xtask", "workspaces/zygisk-frame-analyzer"]
 
 [package]
 name = "fas-rs-next"
