@@ -2066,3 +2066,7 @@ dependencies = [
  "cc",
  "pkg-config",
 ]
+
+[[package]]
+name = "zygisk-frame-analyzer"
+version = "0.1.0"
