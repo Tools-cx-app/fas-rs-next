@@ -30,8 +30,9 @@ use super::{
 };
 use crate::Controller;
 
-use frame_analyzer::Analyzer;
+use frame_analyzer::Analyzer as EbpfAnalyzer;
 use looper::Looper;
+use zygisk_frame_analyzer::Analyzer as ZygiskAnalyzer;
 
 #[derive(Debug, Clone, Copy)]
 pub struct FasData {
@@ -77,15 +78,26 @@ impl Scheduler {
             .ok_or(Error::SchedulerMissing("Controller"))?;
 
         let node = Node::init()?;
-        let analyzer = Analyzer::new()?;
+        let ebpf_analyzer = EbpfAnalyzer::new()?;
+        let mut zygisk_analyzer = ZygiskAnalyzer::new("/data/adb/fas_rs/zygisk.sock");
+
+        zygisk_analyzer.connection()?;
 
         #[cfg(feature = "extension")]
         {
-            Looper::new(analyzer, config, node, extension, controller).enter_loop()
+            Looper::new(
+                ebpf_analyzer,
+                zygisk_analyzer,
+                config,
+                node,
+                extension,
+                controller,
+            )
+            .enter_loop()
         }
         #[cfg(not(feature = "extension"))]
         {
-            Looper::new(analyzer, config, node, controller).enter_loop()
+            Looper::new(ebpf_analyzer, zygisk_analyzer, config, node, controller).enter_loop()
         }
     }
 }
