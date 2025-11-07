@@ -643,6 +643,7 @@ dependencies = [
  "sys-mount",
  "thiserror 2.0.17",
  "toml",
+ "zygisk-frame-analyzer",
 ]
 
 [[package]]
