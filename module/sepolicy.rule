@@ -1,1 +1,0 @@
-allow zygote adb_data_file sock_file { create unlink write read }
