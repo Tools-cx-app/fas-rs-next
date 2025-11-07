@@ -23,10 +23,10 @@ impl Analyzer {
         }
     }
 
-    pub fn connection(&mut self) -> Result<&mut Self> {
+    pub fn connection(&mut self) -> Result<()> {
         self.connect = Some(UnixStream::connect(self.sock_addr.clone())?);
 
-        Ok(self)
+        Ok(())
     }
 
     pub fn dump(&mut self, timeout: u64) -> (String, i32) {
