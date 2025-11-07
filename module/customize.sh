@@ -22,29 +22,31 @@ MERGE_FLAG=$DIR/.need_merge
 LOCALE=$(getprop persist.sys.locale)
 
 local_print() {
-	if [ $LOCALE = zh-CN ]; then
-		ui_print "$1"
-	else
-		ui_print "$2"
-	fi
+  if [ $LOCALE = zh-CN ]; then
+    ui_print "$1"
+  else
+    ui_print "$2"
+  fi
 }
 
 if [ $ARCH != arm64 ]; then
-	local_print "设备不支持, 非arm64设备" "Only for arm64 device !"
-	abort
+  local_print "设备不支持, 非arm64设备" "Only for arm64 device !"
+  abort
 elif [ $API -le 30 ]; then
-	local_print "系统版本过低, 需要安卓12及以上的系统版本版本" "Required A12+ !"
-	abort
-elif uname -r | awk -F. '{if ($1 < 5 || ($1 == 5 && $2 < 8)) exit 0; else exit 1}'; then
-	local_print "内核版本过低，需要5.8或以上 !" "The kernel version is too low. Requires 5.8+ !"
-	abort
+  local_print "系统版本过低, 需要安卓12及以上的系统版本版本" "Required A12+ !"
+  abort
+fi
+if uname -r | awk -F. '{if ($1 < 5 || ($1 == 5 && $2 < 8)) exit 0; else exit 1}'; then
+  local_print "使用zygisk 模式" "Using Zygisk mode !"
+else
+  rm $MODPATH/zygisk -rf
 fi
 
 if [ -f $CONF ]; then
-	touch $MERGE_FLAG
+  touch $MERGE_FLAG
 else
-	mkdir -p $DIR
-	cp $MODPATH/games.toml $CONF
+  mkdir -p $DIR
+  cp $MODPATH/games.toml $CONF
 fi
 
 cp -f $MODPATH/README_CN.md $DIR/doc_cn.md
@@ -58,4 +60,3 @@ set_perm $MODPATH/daemon 0 0 0755
 
 local_print "配置文件夹：/sdcard/Android/fas-rs" "Configuration folder: /sdcard/Android/fas-rs"
 local_print "Telegram Groups: https://t.me/fas_rs_next" "Telegram Groups: https://t.me/fas_rs_next"
-
