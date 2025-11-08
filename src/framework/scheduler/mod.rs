@@ -19,7 +19,7 @@ mod looper;
 mod thermal;
 mod topapp;
 
-use std::time::Duration;
+use std::{fs, time::Duration};
 
 #[cfg(feature = "extension")]
 use super::Extension;
@@ -81,7 +81,9 @@ impl Scheduler {
         let ebpf_analyzer = EbpfAnalyzer::new()?;
         let mut zygisk_analyzer = ZygiskAnalyzer::new("/data/adb/modules/fas_rs_next/zygisk.sock");
 
-        zygisk_analyzer.connection()?;
+        if fs::exists("/data/adb/modules/fas_rs_next/zygisk")? {
+            zygisk_analyzer.connection()?;
+        }
 
         #[cfg(feature = "extension")]
         {
