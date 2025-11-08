@@ -24,11 +24,10 @@ use std::{
     time::{Duration, Instant},
 };
 
-use frame_analyzer::Analyzer as EbpfAnalyzer;
+use frame_analyzer::Analyzer;
 use likely_stable::{likely, unlikely};
 use log::{debug, info};
 use policy::{ControllerParams, controll::calculate_control};
-use zygisk_frame_analyzer::Analyzer as ZygiskAnalyzer;
 
 use super::{FasData, thermal::Thermal, topapp::TopAppsWatcher};
 use crate::{
@@ -55,7 +54,6 @@ const EXCLUDE_LIST: &[&str] = &[
     "com.tungsten.hmclpe",
 ];
 const DISABL_PATH: &str = "/data/adb/fas_rs/disable";
-const ZYGISK_PATH: &str = "/data/adb/modules/fas_rs_next/zygisk";
 
 #[derive(PartialEq)]
 enum State {
@@ -71,14 +69,8 @@ struct FasState {
     buffer: Option<Buffer>,
 }
 
-struct EbpfAnalyzerState {
-    analyzer: EbpfAnalyzer,
-    restart_counter: u8,
-    restart_timer: Instant,
-}
-
-struct ZygiskAnalyzerState {
-    analyzer: ZygiskAnalyzer,
+struct AnalyzerState {
+    analyzer: Analyzer,
     restart_counter: u8,
     restart_timer: Instant,
 }
@@ -92,8 +84,7 @@ struct ControllerState {
 
 #[cfg(feature = "extension")]
 pub struct Looper {
-    ebpf_analyzer_state: EbpfAnalyzerState,
-    zygisk_analyzer_state: ZygiskAnalyzerState,
+    analyzer_state: AnalyzerState,
     config: Config,
     node: Node,
     extension: Extension,
@@ -106,8 +97,7 @@ pub struct Looper {
 
 #[cfg(not(feature = "extension"))]
 pub struct Looper {
-    ebpf_analyzer_state: EbpfAnalyzerState,
-    zygisk_analyzer_state: ZygiskAnalyzerState,
+    analyzer_state: AnalyzerState,
     config: Config,
     node: Node,
     therminal: Thermal,
@@ -120,21 +110,15 @@ pub struct Looper {
 impl Looper {
     #[cfg(feature = "extension")]
     pub fn new(
-        ebpf_analyzer: EbpfAnalyzer,
-        zygisk_analyzer: ZygiskAnalyzer,
+        analyzer: Analyzer,
         config: Config,
         node: Node,
         extension: Extension,
         controller: Controller,
     ) -> Self {
         Self {
-            ebpf_analyzer_state: EbpfAnalyzerState {
-                analyzer: ebpf_analyzer,
-                restart_counter: 0,
-                restart_timer: Instant::now(),
-            },
-            zygisk_analyzer_state: ZygiskAnalyzerState {
-                analyzer: zygisk_analyzer,
+            analyzer_state: AnalyzerState {
+                analyzer,
                 restart_counter: 0,
                 restart_timer: Instant::now(),
             },
@@ -160,21 +144,10 @@ impl Looper {
     }
 
     #[cfg(not(feature = "extension"))]
-    pub fn new(
-        ebpf_analyzer: EbpfAnalyzer,
-        zygisk_analyzer: ZygiskAnalyzer,
-        config: Config,
-        node: Node,
-        controller: Controller,
-    ) -> Self {
+    pub fn new(analyzer: Analyzer, config: Config, node: Node, controller: Controller) -> Self {
         Self {
-            ebpf_analyzer_state: EbpfAnalyzerState {
-                analyzer: ebpf_analyzer,
-                restart_counter: 0,
-                restart_timer: Instant::now(),
-            },
-            zygisk_analyzer_state: ZygiskAnalyzerState {
-                analyzer: zygisk_analyzer,
+            analyzer_state: AnalyzerState {
+                analyzer,
                 restart_counter: 0,
                 restart_timer: Instant::now(),
             },
@@ -272,50 +245,32 @@ impl Looper {
     }
 
     fn recv_message(&mut self) -> Option<FasData> {
-        if fs::exists(ZYGISK_PATH).unwrap() {
-            let (frametime, pid) = self.zygisk_analyzer_state.analyzer.dump(1);
-            Some(FasData {
-                pid,
-                frametime: Duration::from_nanos(frametime.parse::<u64>().unwrap()),
-            })
-        } else {
-            self.ebpf_analyzer_state
-                .analyzer
-                .recv_timeout(Duration::from_millis(100))
-                .map(|(pid, frametime)| FasData { pid, frametime })
-        }
+        self.analyzer_state
+            .analyzer
+            .recv_timeout(Duration::from_millis(100))
+            .map(|(pid, frametime)| FasData { pid, frametime })
     }
 
     fn update_analyzer(&mut self) -> Result<()> {
         for pid in self.windows_watcher.topapp_pids().iter().copied() {
             let pkg = get_process_name(pid)?;
-            if self.config.need_fas(&pkg) && fs::exists(ZYGISK_PATH).unwrap() {
-                self.ebpf_analyzer_state.analyzer.attach_app(pid)?;
+            if self.config.need_fas(&pkg) {
+                self.analyzer_state.analyzer.attach_app(pid)?;
             }
         }
         Ok(())
     }
 
     fn restart_analyzer(&mut self) {
-        if self.ebpf_analyzer_state.restart_counter == 1 {
-            if self.ebpf_analyzer_state.restart_timer.elapsed() >= Duration::from_secs(1) {
-                self.ebpf_analyzer_state.restart_timer = Instant::now();
-                self.ebpf_analyzer_state.restart_counter = 0;
-                self.ebpf_analyzer_state.analyzer.detach_apps();
+        if self.analyzer_state.restart_counter == 1 {
+            if self.analyzer_state.restart_timer.elapsed() >= Duration::from_secs(1) {
+                self.analyzer_state.restart_timer = Instant::now();
+                self.analyzer_state.restart_counter = 0;
+                self.analyzer_state.analyzer.detach_apps();
                 let _ = self.update_analyzer();
             }
         } else {
-            self.ebpf_analyzer_state.restart_counter += 1;
-        }
-
-        if self.zygisk_analyzer_state.restart_counter == 1 {
-            if self.zygisk_analyzer_state.restart_timer.elapsed() >= Duration::from_secs(1) {
-                self.zygisk_analyzer_state.restart_timer = Instant::now();
-                self.zygisk_analyzer_state.restart_counter = 0;
-                let _ = self.update_analyzer();
-            }
-        } else {
-            self.ebpf_analyzer_state.restart_counter += 1;
+            self.analyzer_state.restart_counter += 1;
         }
     }
 
@@ -356,12 +311,10 @@ impl Looper {
                 .topapp_pids()
                 .contains(&buffer.package_info.pid)
         {
-            if !fs::exists(ZYGISK_PATH).unwrap() {
-                let _ = self
-                    .ebpf_analyzer_state
-                    .analyzer
-                    .detach_app(buffer.package_info.pid);
-            }
+            let _ = self
+                .analyzer_state
+                .analyzer
+                .detach_app(buffer.package_info.pid);
             #[cfg(feature = "extension")]
             {
                 let pkg = buffer.package_info.pkg.clone();

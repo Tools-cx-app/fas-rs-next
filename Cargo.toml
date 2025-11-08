@@ -16,7 +16,7 @@
 # with fas-rs. If not, see <https://www.gnu.org/licenses/>.
 
 [workspace]
-members = [ "workspaces/daemon","workspaces/xtask", "workspaces/zygisk-frame-analyzer"]
+members = [ "daemon","xtask"]
 
 [package]
 name = "fas-rs-next"
@@ -48,7 +48,6 @@ num_cpus = "1.17.0"
 nix = { version = "0.30.1", features = ["sched"] }
 env_logger = "0.11.8"
 chrono = "0.4.42"
-zygisk-frame-analyzer = { version = "0.1.0", path = "workspaces/zygisk-frame-analyzer" }
 
 [features]
 extension = ["mlua"]
