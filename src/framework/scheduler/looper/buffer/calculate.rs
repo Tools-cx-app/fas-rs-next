@@ -68,24 +68,15 @@ impl Buffer {
             )
             .unwrap_or_default()
     }
-    #[cfg(feature = "extension")]
-    pub fn calculate_target_fps(&mut self, extension: &Extension) {
+
+    pub fn calculate_target_fps(&mut self, #[cfg(feature = "extension")] extension: &Extension) {
         let new_target_fps = self.target_fps();
         if self.target_fps_state.target_fps != new_target_fps || new_target_fps.is_none() {
             self.reset_frametime_state();
+            #[cfg(feature = "extension")]
             if let Some(target_fps) = new_target_fps {
                 self.trigger_target_fps_change(extension, target_fps);
             }
-            self.target_fps_state.target_fps = new_target_fps;
-            self.unusable();
-        }
-    }
-
-    #[cfg(not(feature = "extension"))]
-    pub fn calculate_target_fps(&mut self) {
-        let new_target_fps = self.target_fps();
-        if self.target_fps_state.target_fps != new_target_fps || new_target_fps.is_none() {
-            self.reset_frametime_state();
             self.target_fps_state.target_fps = new_target_fps;
             self.unusable();
         }

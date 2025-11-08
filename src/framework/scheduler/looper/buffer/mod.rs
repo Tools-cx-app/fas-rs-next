@@ -116,8 +116,12 @@ impl Buffer {
             state: BufferState::new(),
         }
     }
-    #[cfg(feature = "extension")]
-    pub fn push_frametime(&mut self, d: Duration, extension: &Extension) {
+
+    pub fn push_frametime(
+        &mut self,
+        d: Duration,
+        #[cfg(feature = "extension")] extension: &Extension,
+    ) {
         self.frametime_state.additional_frametime = Duration::ZERO;
         self.state.last_update = Instant::now();
 
@@ -129,36 +133,13 @@ impl Buffer {
         }
 
         self.frametime_state.frametimes.push_front(d);
+        #[cfg(feature = "extension")]
         self.try_calculate(extension);
-    }
-
-    #[cfg(not(feature = "extension"))]
-    pub fn push_frametime(&mut self, d: Duration) {
-        self.frametime_state.additional_frametime = Duration::ZERO;
-        self.state.last_update = Instant::now();
-
-        while self.frametime_state.frametimes.len()
-            >= self.target_fps_state.target_fps.unwrap_or(144) as usize * 5
-        {
-            self.frametime_state.frametimes.pop_back();
-            self.try_usable();
-        }
-
-        self.frametime_state.frametimes.push_front(d);
+        #[cfg(not(feature = "extension"))]
         self.try_calculate();
     }
 
-    #[cfg(feature = "extension")]
-    fn try_calculate(&mut self, extension: &Extension) {
-        self.calculate_current_fps();
-        if unlikely(self.state.calculate_timer.elapsed() >= Duration::from_millis(100)) {
-            self.state.calculate_timer = Instant::now();
-            self.calculate_target_fps(extension);
-        }
-    }
-
-    #[cfg(not(feature = "extension"))]
-    fn try_calculate(&mut self) {
+    fn try_calculate(&mut self, #[cfg(feature = "extension")] extension: &Extension) {
         self.calculate_current_fps();
         if unlikely(self.state.calculate_timer.elapsed() >= Duration::from_millis(100)) {
             self.state.calculate_timer = Instant::now();
@@ -182,13 +163,9 @@ impl Buffer {
         self.state.working_state_timer = Instant::now();
     }
 
-    #[cfg(feature = "extension")]
-    pub fn additional_frametime(&mut self, extension: &Extension) {
+    pub fn additional_frametime(&mut self, #[cfg(feature = "extension")] extension: &Extension) {
         self.frametime_state.additional_frametime = self.state.last_update.elapsed();
+        #[cfg(feature = "extension")]
         self.try_calculate(extension);
-    }
-    #[cfg(not(feature = "extension"))]
-    pub fn additional_frametime(&mut self) {
-        self.frametime_state.additional_frametime = self.state.last_update.elapsed();
     }
 }

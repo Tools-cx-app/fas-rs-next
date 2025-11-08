@@ -82,11 +82,11 @@ struct ControllerState {
     usage_sample_timer: Instant,
 }
 
-#[cfg(feature = "extension")]
 pub struct Looper {
     analyzer_state: AnalyzerState,
     config: Config,
     node: Node,
+    #[cfg(feature = "extension")]
     extension: Extension,
     therminal: Thermal,
     windows_watcher: TopAppsWatcher,
@@ -95,25 +95,12 @@ pub struct Looper {
     controller_state: ControllerState,
 }
 
-#[cfg(not(feature = "extension"))]
-pub struct Looper {
-    analyzer_state: AnalyzerState,
-    config: Config,
-    node: Node,
-    therminal: Thermal,
-    windows_watcher: TopAppsWatcher,
-    cleaner: Cleaner,
-    fas_state: FasState,
-    controller_state: ControllerState,
-}
-
 impl Looper {
-    #[cfg(feature = "extension")]
     pub fn new(
         analyzer: Analyzer,
         config: Config,
         node: Node,
-        extension: Extension,
+        #[cfg(feature = "extension")] extension: Extension,
         controller: Controller,
     ) -> Self {
         Self {
@@ -124,35 +111,8 @@ impl Looper {
             },
             config,
             node,
+            #[cfg(feature = "extension")]
             extension,
-            therminal: Thermal::new().unwrap(),
-            windows_watcher: TopAppsWatcher::new(),
-            cleaner: Cleaner::new(),
-            fas_state: FasState {
-                mode: Mode::Balance,
-                buffer: None,
-                working_state: State::NotWorking,
-                delay_timer: Instant::now(),
-            },
-            controller_state: ControllerState {
-                controller,
-                params: ControllerParams::default(),
-                target_fps_offset: 0.0,
-                usage_sample_timer: Instant::now(),
-            },
-        }
-    }
-
-    #[cfg(not(feature = "extension"))]
-    pub fn new(analyzer: Analyzer, config: Config, node: Node, controller: Controller) -> Self {
-        Self {
-            analyzer_state: AnalyzerState {
-                analyzer,
-                restart_counter: 0,
-                restart_timer: Instant::now(),
-            },
-            config,
-            node,
             therminal: Thermal::new().unwrap(),
             windows_watcher: TopAppsWatcher::new(),
             cleaner: Cleaner::new(),
