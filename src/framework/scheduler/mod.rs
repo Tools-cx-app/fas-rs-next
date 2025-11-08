@@ -79,7 +79,7 @@ impl Scheduler {
 
         let node = Node::init()?;
         let ebpf_analyzer = EbpfAnalyzer::new()?;
-        let mut zygisk_analyzer = ZygiskAnalyzer::new("/data/adb/fas_rs/zygisk.sock");
+        let mut zygisk_analyzer = ZygiskAnalyzer::new("/data/adb/modules/fas_rs_next/zygisk.sock");
 
         zygisk_analyzer.connection()?;
 
