@@ -129,8 +129,6 @@ fn build(release: bool, verbose: bool, extension: bool) -> Result<()> {
         "--target",
         "aarch64-linux-android",
         "-Z",
-        "build-std",
-        "-Z",
         "trim-paths",
     ];
     if extension {
