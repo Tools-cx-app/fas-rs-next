@@ -21,8 +21,15 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    groups:
+      crates:
+        patterns:
+          - "*"
   - package-ecosystem: "cargo" # See documentation for possible values
     directory: "/daemon" # Location of package manifests
     schedule:
       interval: "weekly"
-      
+    groups:
+      crates:
+        patterns:
+          - "*"
