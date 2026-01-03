@@ -17,7 +17,7 @@
 # with fas-rs. If not, see <https://www.gnu.org/licenses/>.
 
 MODDIR=${0%/*}
-DIR=/sdcard/Android/fas-rs
+DIR=/data/adb/fas-rs-next
 MERGE_FLAG=$DIR/.need_merge
 LOG=$DIR/fas_log.txt
 LANGUAGE=$(getprop persist.sys.locale | cut -d'-' -f1)

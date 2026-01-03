@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License along
 # with fas-rs. If not, see <https://www.gnu.org/licenses/>.
 
-DIR=/sdcard/Android/fas-rs
+DIR=/data/adb/fas-rs-next
 CONF=$DIR/games.toml
 MERGE_FLAG=$DIR/.need_merge
 LOCALE=$(getprop persist.sys.locale)
@@ -56,6 +56,6 @@ set_perm_recursive $MODPATH 0 0 0755 0644
 set_perm $MODPATH/fas-rs-next 0 0 0755
 set_perm $MODPATH/daemon 0 0 0755
 
-local_print "配置文件夹：/sdcard/Android/fas-rs" "Configuration folder: /sdcard/Android/fas-rs"
+local_print "配置文件夹：/data/adb/fas-rs-next" "Configuration folder: /sdcard/Android/fas-rs"
 local_print "Telegram Groups: https://t.me/fas_rs_next" "Telegram Groups: https://t.me/fas_rs_next"
 
