@@ -1,0 +1,171 @@
+# Copyright 2023-2025, dependabot[bot], shadow3, shadow3aaa
+#
+# This file is part of fas-rs.
+#
+# fas-rs is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+#
+# fas-rs is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along
+# with fas-rs. If not, see <https://www.gnu.org/licenses/>.
+
+name: ci-build
+on:
+  push:
+    tags:
+      - "v*.*.*"
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  release-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache NDK
+        id: cache-ndk
+        uses: actions/cache@v4
+        with:
+          path: ~/ndk_temp
+          key: ndk-${{ runner.os }}-ndk_temp
+      - name: Setup ndk
+        if: steps.cache-ndk.outputs.cache-hit != 'true'
+        run: |
+          ndk_url=$(wget -qO- https://github.com/android/ndk/releases/latest | grep -e 'https://dl.google.com/android/repository/android-ndk-.*-linux.zip' | sed -n 's/.*<a href="\([^"]*\)".*/\1/p')
+          wget -O ndk.zip $ndk_url -nv
+          mkdir -p ~/ndk_temp
+          unzip ndk.zip -d ~/ndk_temp 2>&1 > /dev/null
+          mv ~/ndk_temp/*/* ~/ndk_temp
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+          targets: aarch64-linux-android
+          components: rust-src
+      - name: Install build dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y gcc-multilib
+          cargo install cargo-ndk --locked
+      - name: Setup WebUI Deps
+        run: |
+          npm install next@latest react@latest react-dom@latest
+          cd webui
+          npm install
+      - name: Build
+        run: |
+          export ANDROID_NDK_HOME=$(realpath ~/ndk_temp)
+          export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
+          cargo ndk -t arm64-v8a b -r --package daemon
+          cp ./target/aarch64-linux-android/release/daemon  ./module/
+          cargo xtask build -r
+      - name: Prepare artifacts
+        run: |
+          mkdir -p output/artifact/release
+          unzip "output/fas-rs-next(release).zip" -d output/artifact/release
+      - name: Upload release version
+        uses: actions/upload-artifact@v4
+        with:
+          name: fas-rs-next(release)
+          compression-level: 9
+          path: output/artifact/release
+  release-extension-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache NDK
+        id: cache-ndk
+        uses: actions/cache@v4
+        with:
+          path: ~/ndk_temp
+          key: ndk-${{ runner.os }}-ndk_temp
+      - name: Setup ndk
+        if: steps.cache-ndk.outputs.cache-hit != 'true'
+        run: |
+          ndk_url=$(wget -qO- https://github.com/android/ndk/releases/latest | grep -e 'https://dl.google.com/android/repository/android-ndk-.*-linux.zip' | sed -n 's/.*<a href="\([^"]*\)".*/\1/p')
+          wget -O ndk.zip $ndk_url -nv
+          mkdir -p ~/ndk_temp
+          unzip ndk.zip -d ~/ndk_temp 2>&1 > /dev/null
+          mv ~/ndk_temp/*/* ~/ndk_temp
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+          targets: aarch64-linux-android
+          components: rust-src
+      - name: Install build dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y gcc-multilib
+          cargo install cargo-ndk --locked
+      - name: Setup WebUI Deps
+        run: |
+          npm install next@latest react@latest react-dom@latest
+          cd webui
+          npm install
+      - name: Build
+        run: |
+          export ANDROID_NDK_HOME=$(realpath ~/ndk_temp)
+          export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
+          cargo ndk -t arm64-v8a b -r --package daemon
+          cp ./target/aarch64-linux-android/release/daemon  ./module/
+          cargo xtask --extension build -r
+          mv "output/fas-rs-next(release).zip" "output/fas-rs-next-extension(release).zip"
+      - name: Prepare artifacts
+        run: |
+          mkdir -p output/artifact/release
+          unzip "output/fas-rs-next-extension(release).zip" -d output/artifact/release
+      - name: Upload release version
+        uses: actions/upload-artifact@v4
+        with:
+          name: fas-rs-next-extension(release)
+          compression-level: 9
+          path: output/artifact/release
+  push_to_ci_group:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    name: Push to CI Group
+    needs:
+      - release-extension-build
+      - release-build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Package Artifacts
+        run: |
+          cd "${{ github.workspace }}/artifacts/fas-rs-next(release)"
+          zip -9 -rq "../../fas-rs-next(release).zip" .
+          cd "${{ github.workspace }}/artifacts/fas-rs-next-extension(release)"
+          zip -9 -rq "../../fas-rs-next-extension(release).zip" .
+          cd "${{ github.workspace }}"
+      - name: Install git-cliff
+        run: |
+          curl -sSL https://github.com/orhun/git-cliff/releases/download/v2.10.1/git-cliff-2.10.1-x86_64-unknown-linux-gnu.tar.gz -o git-cliff.tar.gz
+          tar -xf git-cliff.tar.gz
+          sudo mv git-cliff-2.10.1/git-cliff /usr/local/bin/
+      - name: Generate Changelog
+        run: |
+          PROP_FILE="module/module.prop"
+          VERSION=$(grep "^version=" "$PROP_FILE" | cut -d= -f2 | sed 's/-.*//')
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          git-cliff "$PREV_TAG".."$VERSION" -o /tmp/changelog.md
+      - name: Create Release with GitHub CLI
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          gh release create ${{ github.ref_name }} \
+            --title "${{ github.ref_name }}" \
+            --notes-file /tmp/changelog.md \
+            --draft=false \
+            --prerelease=false \
+            "fas-rs-next-**.zip"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
