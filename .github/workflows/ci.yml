@@ -19,8 +19,22 @@ name: ci-build
 on:
   push:
     branches: ["master"]
+    paths:
+      - 'src/**'
+      - 'Cargo.*'
+      - 'module/**'
+      - 'webui/**'
+      - 'build.rs'
+      - '.github/workflows/ci.yml'
   pull_request:
     branches: ["master"]
+    paths:
+      - 'src/**'
+      - 'Cargo.*'
+      - 'module/**'
+      - 'webui/**'
+      - 'build.rs'
+      - '.github/workflows/ci.yml'
 env:
   CARGO_TERM_COLOR: always
 jobs:
