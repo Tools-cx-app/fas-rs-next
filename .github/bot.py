@@ -43,9 +43,7 @@ async def send_telegram_message():
             entity=CHAT_ID,
             file=["./fas-rs-next(release).zip", "./fas-rs-next-extension(release).zip"],
             parse_mode="markdown",
-            album=True
-        )
-        await client.send_message(CHAT_ID, get_caption(), parse_mode="markdown")
+            caption=get_caption())
 
 if __name__ == '__main__':
     asyncio.run(send_telegram_message())
