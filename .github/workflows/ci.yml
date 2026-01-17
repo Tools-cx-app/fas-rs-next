@@ -48,9 +48,6 @@ jobs:
           toolchain: nightly
           targets: aarch64-linux-android
           components: rust-src
-      - uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: "ndk-rust"
       - name: Install build dependencies
         run: |
           sudo apt update
@@ -102,9 +99,6 @@ jobs:
           toolchain: nightly
           targets: aarch64-linux-android
           components: rust-src
-      - uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: "ndk-rust"
       - name: Install build dependencies
         run: |
           sudo apt update
