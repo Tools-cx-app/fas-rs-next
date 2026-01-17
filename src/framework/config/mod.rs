@@ -20,7 +20,7 @@ mod inner;
 mod merge;
 mod read;
 
-use std::{collections::HashSet, fs, path::Path, sync::mpsc, thread};
+use std::{fs, path::Path, sync::mpsc, thread};
 
 use inner::Inner;
 use log::{error, info};
@@ -116,8 +116,11 @@ impl Config {
         )
     }
 
-    pub fn need_exclued(&mut self) -> HashSet<String> {
-        self.inner.config().exclude_list.clone()
+    pub fn need_exclued<S>(&mut self, pkg: S) -> bool
+    where
+        S: AsRef<str>,
+    {
+        self.inner.config().exclude_list.contains(pkg.as_ref())
     }
 
     #[must_use]

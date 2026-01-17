@@ -145,10 +145,7 @@ impl Looper {
             }
 
             if let Some(buffer) = self.fas_state.buffer.as_ref()
-                && self
-                    .config
-                    .need_exclued()
-                    .contains(&buffer.package_info.pkg)
+                && self.config.need_exclued(&buffer.package_info.pkg)
             {
                 self.disable_fas();
                 debug!("pkg is in EXCLUDE_LIST, fas is disabled");
