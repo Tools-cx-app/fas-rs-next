@@ -36,7 +36,6 @@ fi
 
 killall fas-rs-next
 RUST_BACKTRACE=1 nohup $MODDIR/fas-rs-next run $MODDIR/games.toml >$LOG 2>&1 &
-RUST_BACKTRACE=1 nohup $MODDIR/daemon 2>&1 &
 
 if [ "$LANGUAGE" = "zh" ]; then
   su -lp 2000 -c "cmd notification post -S bigtext -t 'FAS-RS-NEXT' 'Tag' '感谢使用fas-rs-next，滑动以删除本通知。Powered by Tools-cx-app'"

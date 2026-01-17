@@ -16,7 +16,7 @@
 # with fas-rs. If not, see <https://www.gnu.org/licenses/>.
 
 [workspace]
-members = [ "daemon","xtask"]
+members = ["xtask"]
 
 [package]
 name = "fas-rs-next"
@@ -55,7 +55,6 @@ extension = ["mlua"]
 [build-dependencies]
 anyhow = "1.0.100"
 toml = "0.9.11"
-serde_json = "1.0.149"
 serde = { version = "1.0.228", features = ["derive"] }
 
 [profile.dev]
