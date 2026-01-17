@@ -48,11 +48,6 @@ use buffer::{Buffer, BufferWorkingState};
 use clean::Cleaner;
 
 const DELAY_TIME: Duration = Duration::from_secs(3);
-const EXCLUDE_LIST: &[&str] = &[
-    "com.tungsten.fcl",
-    "net.kdt.pojavlaunch",
-    "com.tungsten.hmclpe",
-];
 const DISABL_PATH: &str = "/data/adb/fas_rs/disable";
 
 #[derive(PartialEq)]
@@ -150,7 +145,10 @@ impl Looper {
             }
 
             if let Some(buffer) = self.fas_state.buffer.as_ref()
-                && EXCLUDE_LIST.contains(&buffer.package_info.pkg.as_str())
+                && self
+                    .config
+                    .need_exclued()
+                    .contains(&buffer.package_info.pkg)
             {
                 self.disable_fas();
                 debug!("pkg is in EXCLUDE_LIST, fas is disabled");

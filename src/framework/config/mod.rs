@@ -20,7 +20,7 @@ mod inner;
 mod merge;
 mod read;
 
-use std::{fs, path::Path, sync::mpsc, thread};
+use std::{collections::HashSet, fs, path::Path, sync::mpsc, thread};
 
 use inner::Inner;
 use log::{error, info};
@@ -114,6 +114,10 @@ impl Config {
                 }
             },
         )
+    }
+
+    pub fn need_exclued(&mut self) -> HashSet<String> {
+        self.inner.config().exclude_list.clone()
     }
 
     #[must_use]

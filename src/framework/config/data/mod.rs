@@ -33,6 +33,7 @@ pub struct ConfigData {
     pub performance: ModeConfig,
     pub fast: ModeConfig,
     pub logger_level: String,
+    pub exclude_list: HashSet<String>,
 }
 
 #[allow(clippy::struct_excessive_bools)]
