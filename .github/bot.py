@@ -2,6 +2,7 @@ from telethon import TelegramClient
 import asyncio
 from telethon.sessions import StringSession
 import os
+import sys
 
 API_ID = 611335
 API_HASH = "d524b414d21f4d37f08684c1df41ac9c"
@@ -33,17 +34,21 @@ def get_caption():
     return msg
 
 async def send_telegram_message():
+    files = sys.argv[1:]
+    print("[+] Files:", files)
+    if len(files) <= 0:
+        print("[-] No files to upload")
+        exit(1)
     async with TelegramClient(StringSession(BOT_CI_SESSION), api_id=API_ID, api_hash=API_HASH) as client:
         await client.start(bot_token=BOT_TOKEN)
-        print("[+] Caption: ")
-        print("---")
-        print("---")
+        caption = [""] * len(files)
+        caption[-1] = get_caption()
         print("[+] Sending")
         await client.send_file(
             entity=CHAT_ID,
-            file=["./fas-rs-next(release).zip", "./fas-rs-next-extension(release).zip"],
+            file=files,
             parse_mode="markdown",
-            caption=get_caption())
+            caption=caption)
 
 if __name__ == '__main__':
     asyncio.run(send_telegram_message())
