@@ -1,5 +1,4 @@
 logger_level = "info"
-exclude_list = ["com.tungsten.fcl", "net.kdt.pojavlaunch", "com.tungsten.hmclpe"]
 
 [config]
 keep_std = true

@@ -116,13 +116,6 @@ impl Config {
         )
     }
 
-    pub fn need_exclued<S>(&mut self, pkg: S) -> bool
-    where
-        S: AsRef<str>,
-    {
-        self.inner.config().exclude_list.contains(pkg.as_ref())
-    }
-
     #[must_use]
     pub fn mode_config(&mut self, m: Mode) -> &ModeConfig {
         match m {
