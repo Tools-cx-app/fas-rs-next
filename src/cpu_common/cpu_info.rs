@@ -93,14 +93,14 @@ impl Info {
                 let min_acceptable_freq = self
                     .freqs
                     .iter()
-                    .take_while(|freq| **freq <= verify_freq)
+                    .take_while(|freq| **freq < verify_freq)
                     .last()
                     .copied()
                     .unwrap_or(verify_freq);
                 let max_acceptable_freq = self
                     .freqs
                     .iter()
-                    .find(|freq| **freq >= verify_freq)
+                    .find(|freq| **freq > verify_freq)
                     .copied()
                     .unwrap_or(verify_freq);
                 if !(min_acceptable_freq..=max_acceptable_freq).contains(&current_freq) {
