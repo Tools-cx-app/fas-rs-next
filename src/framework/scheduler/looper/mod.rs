@@ -141,7 +141,6 @@ impl Looper {
             self.switch_mode();
             let _ = self.update_analyzer();
             self.retain_topapp();
-            log::set_max_level(self.config.logger_level());
 
             if self.windows_watcher.visible_freeform_window() {
                 self.disable_fas();
