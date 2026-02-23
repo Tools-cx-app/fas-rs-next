@@ -79,7 +79,7 @@ where
 
         writeln!(
             buf,
-            "[{}] [{}] [{}] {}",
+            "[{}] {}({}): {}",
             time_str,
             record.level(),
             record.target(),
