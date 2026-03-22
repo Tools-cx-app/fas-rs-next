@@ -36,7 +36,7 @@ log = "0.4.29"
 anyhow = { version = "1.0.102" }
 inotify = { version = "0.11.1", default-features = false }
 libc = "0.2.183"
-toml = "1.0.6"
+toml = "1.0.7"
 serde = { version = "1.0.228", features = ["derive"] }
 sys-mount = { version = "3.1.0", default-features = false }
 quick-xml = { version = "0.39.2", features = ["serialize"] }
@@ -54,7 +54,7 @@ extension = ["mlua"]
 
 [build-dependencies]
 anyhow = "1.0.102"
-toml = "1.0.6"
+toml = "1.0.7"
 serde = { version = "1.0.228", features = ["derive"] }
 
 [profile.dev]
